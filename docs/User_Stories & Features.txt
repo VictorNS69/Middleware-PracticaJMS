@@ -1,0 +1,28 @@
+FEATURES:
+	-CLIENTE (C)
+		- 1. login
+		- 2. consultar noticias (filtradas)
+		- 3. deslogear
+
+	-MIDDLE (M)
+		- 4. crear noticia
+		- 5. filtrar noticias
+		- 6. manejar clientes
+		- 7. suscripciones
+
+User Stories:
+	(C)
+	- 1.1. loginUsuario (solicitud)
+	- 2.1. filtrarTematicaReq (solicitud)
+	- 2.2. filtrarPalabraClaveReq (solicitud)
+	- 2.3. filtrarFechaReq (solicitud)
+	- 3.1. logOutUsuario (solicitud)
+	(M)
+	- 4.1 crearNoticia
+	- 4.2 crearNoticiaArchivos
+	- 5.1. filtrarTematica (logica)
+	- 5.2. filtrarPalabraClave (logica)
+	- 5.3. filtrarFecha (logica)
+	- 6.1 controlUsuarios (logica)
+	- 7.1 manejarSuscripciones (mostrar solo por suscripcion)
+
