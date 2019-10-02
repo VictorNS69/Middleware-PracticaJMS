@@ -29,3 +29,8 @@ ClienteSN/.gitignore
 .settings/
 ServidorNoticias/.gitignore
 
+# mq directory
+mq/
+
+# dev scripts
+run_broker.sh
