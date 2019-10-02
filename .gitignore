@@ -33,4 +33,4 @@ ServidorNoticias/.gitignore
 mq/
 
 # dev scripts
-run_broker.sh
+
