@@ -2,7 +2,7 @@ FEATURES:
 	-CLIENTE (C)
 		- 1. login
 		- 2. consultar noticias (filtradas)
-		- 3. deslogear
+		- 3. logout
 
 	-MIDDLE (M)
 		- 4. crear noticia
