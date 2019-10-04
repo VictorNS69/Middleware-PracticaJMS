@@ -16,7 +16,7 @@ User Stories:
 	- 2.1. filtrarTematicaReq (solicitud)
 	- 2.2. filtrarPalabraClaveReq (solicitud)
 	- 2.3. filtrarFechaReq (solicitud)
-	- 3.1. logOutUsuario (solicitud)
+	- 3.1. logoutUsuario (solicitud)
 	(M)
 	- 4.1 crearNoticia
 	- 4.2 crearNoticiaArchivos
