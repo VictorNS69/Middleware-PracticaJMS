@@ -8,9 +8,11 @@ import javax.jms.*;
 public class Server {
 	public static void main( String[] args ){
 		System.out.println("EL SERVIDOR ");
+		/* Ejemplo de login
+		 * ASINCRONO
+		 */
 		try {
 			ConnectionFactory myConnFactory;
-            
 			// Cola de usuarios
 			Queue usuarios = crearCola("usuarios");
         	// Conexion
@@ -18,22 +20,42 @@ public class Server {
 			Connection myConn = myConnFactory.createConnection();
             // Sesion
 			Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
 			// Bucle de espera
 			while(true){
 				// recibir mensaje
 				Message msg = recibirMensaje(mySess, usuarios, myConn);
 				if (msg instanceof TextMessage) {
+					/* Por cada mensaje en usuarios (cada usuario)
+					 * crear un proceso
+					 */
 					TextMessage txtMsg = (TextMessage) msg;
 					System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + usuarios.getQueueName());
-					
 					// Cola Cliente-Servidor
 					Queue colaCS = crearCola("CS" + txtMsg.getText());
 					// Cola Servidor-Cliente
 					Queue colaSC = crearCola("SC" + txtMsg.getText());
-					
 					// Enviar mensaje
-					enviarMensaje(mySess, colaSC, "Recibido!");
+					enviarMensaje(mySess, colaSC, "Recibido! ");
+					
+					/* Aquí habría que esperar a las demás solicitudes
+					 * Cada solicitud atenderla 
+					 */
+					while (true) {
+						msg = recibirMensaje(mySess, colaCS, myConn);
+						/* Aquí habría que esperar a las demás solicitudes
+						 * Cada solicitud atenderla 
+						 */
+						if (msg instanceof TextMessage) {
+							txtMsg = (TextMessage) msg;
+
+							// Ejemplo de matar
+							if (txtMsg.getText().equals("KILL")) {
+								System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaCS.getQueueName());
+								System.out.println("FIN DE LA CONEXION CON CLIENTE ");
+								break;
+							}
+						}
+					}
 					break;
 				}
 			}
