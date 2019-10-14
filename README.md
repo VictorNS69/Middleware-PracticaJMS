@@ -11,15 +11,15 @@ Cada comando ha de ejecutarse en **distintos terminales**.
 
 **Primero, ejecutar el broker**
 ```sh
-./run_broker.sh
+./scripts/run_broker.sh
 ```
 **Segundo, ejecutar el servidor**
 ```sh
-./run_server.sh
+./scripts/run_server.sh
 ```
 **Por ultimo, ejecutar tantos clientes como se desee**
 ```sh
-./run_cliente.sh
+./scripts/run_cliente.sh
 ```
 ## Autores
 - Víctor Nieves Sánchez (Scrum Master & Developer)
