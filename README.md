@@ -4,6 +4,7 @@
 - Maven 3.6.1
 - Java 1.8.0
 - OpenJDK 8
+- OpenMQ 5.1.1
 
 ## Ejecución de la aplicación
 Cada comando ha de ejecutarse en **distintos terminales**.
