@@ -8,19 +8,10 @@ public class Client {
 	public static void main(String[] args) {
 		System.out.println("CLIENTE ");
         try {
-            ConnectionFactory myConnFactory;
- 	        // Conexion
-            myConnFactory = new com.sun.messaging.ConnectionFactory();
-            Connection myConn = myConnFactory.createConnection();
-            // Sesion
-            Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
             // TODO: Hacer el switch aquí y llamar a request
-            request("FiltrarTematica", mySess, myConn);
+            request("FiltrarTematica");
 
             System.out.println("FIN!");
-            // Cerramos sesion y conexion
-            mySess.close();
-            myConn.close();
 
         } 
         catch (Exception jmse) {
@@ -68,7 +59,9 @@ public class Client {
 		// Consumidor
 		MessageConsumer myMsgConsumer = mySess.createConsumer(cola);
 		myConn.start();
-		return myMsgConsumer.receive();
+		Message msg = myMsgConsumer.receive(); 
+		myConn.stop();
+		return msg;
 	}
 	
 	/**Se genera un nombre con la siguiente estructura
@@ -88,7 +81,13 @@ public class Client {
 	 * @param myConn: conexión
 	 * @throws JMSException
 	 */
-	private static void request(String operation, Session mySess, Connection myConn) throws JMSException {
+	private static void request(String operation) throws JMSException {
+        ConnectionFactory myConnFactory;
+	    // Conexion
+        myConnFactory = new com.sun.messaging.ConnectionFactory();
+        Connection myConn = myConnFactory.createConnection();
+        // Sesion
+        Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		// Cola "usuarios"
 		Queue usuarios = crearCola("usuarios");
 		// Nombre unico
@@ -104,6 +103,8 @@ public class Client {
 			if (msg instanceof TextMessage) {
 				TextMessage txtMsg = (TextMessage) msg;
 				System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaSC.getQueueName());
+				myConn.close();
+				mySess.close();
 				break;
 			}
 		}
