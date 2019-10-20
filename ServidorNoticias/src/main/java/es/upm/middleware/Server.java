@@ -27,7 +27,12 @@ public class Server {
                 try {
 				    System.out.println("Read Message: " + requestMessage.getText() + "\tfrom queue: usuarios" );
 					// Cola de la petición
-				    String op = requestMessage.getText().split("\\d+")[0]; 
+				    String[] split = requestMessage.getText().split("\\d+");
+				    
+				    String operation = split[0];
+				    String suscription = split[1];
+				    
+				    System.out.println("operación: " + operation + " Suscripción: " + suscription);
 				    
 				    // Cola Cliente-Servidor
 				    Queue colaSC = new com.sun.messaging.Queue(requestMessage.getText());
@@ -36,26 +41,26 @@ public class Server {
 					MessageProducer myMsgProducer = mySess.createProducer(colaSC);
 			        TextMessage myTextMsg = mySess.createTextMessage();
 
-				    if (op.equals("FiltrarFecha")) {
+				    if (operation.equals("FiltrarFecha")) {
 				    	System.out.println("Solicitud de Filtrar por Fecha");
 				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
 				    	myTextMsg.setText("Solicitud de Filtrar por Fecha");
 				    }
-				    else if (op.equals("FiltrarPalabraClave")) {
+				    else if (operation.equals("FiltrarPalabraClave")) {
 				    	System.out.println("Solicitud de Filtrar por Palabra Clave");
 				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
 				    	myTextMsg.setText("Solicitud de Filtrar por Palabra Clave");
 
 				    }
-				    else if (op.equals("FiltrarTematica")) {
+				    else if (operation.equals("FiltrarTematica")) {
 				    	System.out.println("Solicitud de Filtrar por Temática");
 				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
 				    	myTextMsg.setText("Solicitud de Filtrar por Temática");
 				    }
 				    else {
-				    	System.out.println("No se ha entendido la petición: " + op);
+				    	System.out.println("No se ha entendido la petición: " + operation);
 				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
-				        myTextMsg.setText("No se ha entendido la solicitud: " + op);
+				        myTextMsg.setText("No se ha entendido la solicitud: " + operation);
 				    }
 			        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " +  colaSC.getQueueName());
 			        myMsgProducer.send(myTextMsg);
@@ -91,16 +96,16 @@ public class Server {
             	System.out.println("\t3 Salir");
             	
                 Scanner sc = new Scanner(System.in);
-                Integer option = -1;
+                Integer operation = -1;
                 
         		try {
-        			option = sc.nextInt();
+        			operation = sc.nextInt();
         		}
         		catch (InputMismatchException e) {
             		System.out.println("No has introducido un númerno.\nSaliendo de la aplicación");
             		System.exit(1);
         		}
-                switch(option) {
+                switch(operation) {
 	                case 1:
 	                	System.out.println("Añadir noticia terminal \n\t#TODO");
 	                	break;
@@ -115,7 +120,7 @@ public class Server {
 	                    System.exit(1);
 	                	break;
 	            	default:
-	            		System.out.println("Opción no válida");
+	            		System.out.println("operationción no válida");
 	            		break;
                 }
             }

@@ -9,7 +9,8 @@ public class Client {
 		System.out.println("CLIENTE ");
         try {
             // TODO: Hacer el switch aquí y llamar a request
-            request("FiltrarTematica");
+        	// TODO: Controlar tematica Free o Premium
+        	request("FiltrarTematica", "Free");
 
             System.out.println("FIN!");
 
@@ -69,9 +70,9 @@ public class Client {
 	 * @param op: operación de la solicitud
 	 * @return String nombre único
 	 */
-	private static String uniqueName(String op) {
+	private static String uniqueName(String op, String suscription) {
 		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-		return op + bean.getName().split("[a-zA-Z]+")[0].replace("@", "").replace("-", "") + op;
+		return op + bean.getName().split("[a-zA-Z]+")[0].replace("@", "").replace("-", "") + suscription;
 	}
 	
 	/**
@@ -81,7 +82,7 @@ public class Client {
 	 * @param myConn: conexión
 	 * @throws JMSException
 	 */
-	private static void request(String operation) throws JMSException {
+	private static void request(String operation, String suscription) throws JMSException {
         ConnectionFactory myConnFactory;
 	    // Conexion
         myConnFactory = new com.sun.messaging.ConnectionFactory();
@@ -91,7 +92,7 @@ public class Client {
 		// Cola "usuarios"
 		Queue usuarios = crearCola("usuarios");
 		// Nombre unico
-		String qname = uniqueName(operation);
+		String qname = uniqueName(operation, suscription);
 		// Enviamos mensaje
 		enviarMensaje(mySess, usuarios, qname);
 		// Cola Servidor-Cliente
