@@ -27,11 +27,12 @@ public class Server {
                 try {
 				    System.out.println("Read Message: " + requestMessage.getText() + "\tfrom queue: usuarios" );
 					// Cola de la petición
-				    String op = requestMessage.getText().split("\\d+")[0]; // en [0] tengo la operación
-				    //System.out.println("SEPARACION " + op);
+				    String op = requestMessage.getText().split("\\d+")[0]; 
+				    
 				    // Cola Cliente-Servidor
-				    Queue colaSC = new com.sun.messaging.Queue(requestMessage.getText()); // Cola con nombre OPpidOP
-				    //System.out.println("Se enviará a la cola " + colaSC.getQueueName());
+				    Queue colaSC = new com.sun.messaging.Queue(requestMessage.getText());
+				    System.out.println("Se enviará a la cola " + colaSC.getQueueName());
+				    
 					MessageProducer myMsgProducer = mySess.createProducer(colaSC);
 			        TextMessage myTextMsg = mySess.createTextMessage();
 
@@ -58,7 +59,6 @@ public class Server {
 				    }
 			        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " +  colaSC.getQueueName());
 			        myMsgProducer.send(myTextMsg);
-				    
 				}
                 catch (JMSException e) {
 					e.printStackTrace();
