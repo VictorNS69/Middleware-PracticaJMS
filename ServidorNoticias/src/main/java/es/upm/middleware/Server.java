@@ -1,97 +1,128 @@
 package es.upm.middleware;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Server {
+	// public ConnectionFactory myConnFactory;
+    public static  Connection myConn;
+    public static Session mySess;
+
+    static class TextListenerUsuarios implements MessageListener {
+    	public void onMessage(Message message) {
+    		if (message instanceof TextMessage) {
+    	        TextMessage requestMessage = (TextMessage) message;
+                try {
+				    System.out.println("Read Message: " + requestMessage.getText() + "\tfrom queue: usuarios" );
+					// Cola de la petición
+				    String op = requestMessage.getText().split("\\d+")[0]; // en [0] tengo la operación
+				    //System.out.println("SEPARACION " + op);
+				    // Cola Cliente-Servidor
+				    Queue colaSC = new com.sun.messaging.Queue(requestMessage.getText()); // Cola con nombre OPpidOP
+				    //System.out.println("Se enviará a la cola " + colaSC.getQueueName());
+					MessageProducer myMsgProducer = mySess.createProducer(colaSC);
+			        TextMessage myTextMsg = mySess.createTextMessage();
+
+				    if (op.equals("FiltrarFecha")) {
+				    	System.out.println("Solicitud de Filtrar por Fecha");
+				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
+				    	myTextMsg.setText("Solicitud de Filtrar por Fecha");
+				    }
+				    else if (op.equals("FiltrarPalabraClave")) {
+				    	System.out.println("Solicitud de Filtrar por Palabra Clave");
+				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
+				    	myTextMsg.setText("Solicitud de Filtrar por Palabra Clave");
+
+				    }
+				    else if (op.equals("FiltrarTematica")) {
+				    	System.out.println("Solicitud de Filtrar por Temática");
+				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
+				    	myTextMsg.setText("Solicitud de Filtrar por Temática");
+				    }
+				    else {
+				    	System.out.println("No se ha entendido la petición: " + op);
+				    	// TODO: procesar solicitud y myTextMsg.setText(solucion)
+				        myTextMsg.setText("No se ha entendido la solicitud: " + op);
+				    }
+			        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " +  colaSC.getQueueName());
+			        myMsgProducer.send(myTextMsg);
+				    
+				}
+                catch (JMSException e) {
+					e.printStackTrace();
+				}
+    		}
+    	}
+    }
+    
 	public static void main( String[] args ){
-		System.out.println("EL SERVIDOR ");
-		/* Ejemplo de login
-		 * ASINCRONO
-		 */
+		System.out.println("SERVIDOR ");
 		try {
 			ConnectionFactory myConnFactory;
 			// Cola de usuarios
-			Queue usuarios = crearCola("usuarios");
+			Queue usuarios = new com.sun.messaging.Queue("usuarios");
         	// Conexion
 			myConnFactory = new com.sun.messaging.ConnectionFactory();
-			Connection myConn = myConnFactory.createConnection();
+			myConn = myConnFactory.createConnection();
             // Sesion
-			Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			// Bucle de espera
-			while(true){
-				// recibir mensaje
-				Message msg = recibirMensaje(mySess, usuarios, myConn);
-				if (msg instanceof TextMessage) {
-					/* Por cada mensaje en usuarios (cada usuario)
-					 * crear un proceso
-					 */
-					TextMessage txtMsg = (TextMessage) msg;
-					System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + usuarios.getQueueName());
-					// Cola Cliente-Servidor
-					Queue colaCS = crearCola("CS" + txtMsg.getText());
-					// Cola Servidor-Cliente
-					Queue colaSC = crearCola("SC" + txtMsg.getText());
-					// Enviar mensaje
-					enviarMensaje(mySess, colaSC, "Recibido! ");
-					
-					/* Aquí habría que esperar a las demás solicitudes
-					 * Cada solicitud atenderla 
-					 */
-					while (true) {
-						msg = recibirMensaje(mySess, colaCS, myConn);
-						/* Aquí habría que esperar a las demás solicitudes
-						 * Cada solicitud atenderla 
-						 */
-						if (msg instanceof TextMessage) {
-							txtMsg = (TextMessage) msg;
-
-							// Ejemplo de matar
-							if (txtMsg.getText().equals("KILL")) {
-								System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaCS.getQueueName());
-								System.out.println("FIN DE LA CONEXION CON CLIENTE ");
-								break;
-							}
-						}
-					}
-					break;
-				}
-			}
-			System.out.println("FIN!");
-            // Cerramos sesion y conexion
-			mySess.close();
-			myConn.close();
-
-		} catch (Exception jmse) {
-			System.out.println("Exception occurred : " + jmse.toString());
-			jmse.printStackTrace();
+			mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			
+			// Escuchar en "usuarios"
+			MessageConsumer myMsgConsumer = mySess.createConsumer(usuarios);
+			TextListenerUsuarios textListener = new TextListenerUsuarios();
+            myMsgConsumer.setMessageListener(textListener);
+            myConn.start();
+            
+            while(true){
+            	System.out.println("\t1 Añadir noticia (terminal)");
+            	System.out.println("\t3 Añadir noticia (fichero)");
+            	System.out.println("\t3 Salir");
+            	
+                Scanner sc = new Scanner(System.in);
+                Integer option = -1;
+                
+        		try {
+        			option = sc.nextInt();
+        		}
+        		catch (InputMismatchException e) {
+            		System.out.println("No has introducido un númerno.\nSaliendo de la aplicación");
+            		System.exit(1);
+        		}
+                switch(option) {
+	                case 1:
+	                	System.out.println("Añadir noticia terminal \n\t#TODO");
+	                	break;
+	                case 2:
+	                	System.out.println("Añadir noticia fichero \n\t#TODO");
+	                	break;
+	                case 3:
+	                	System.out.println("\tSalir");
+	                    mySess.close();
+	                    myConn.close();
+	                    sc.close();
+	                    System.exit(1);
+	                	break;
+	            	default:
+	            		System.out.println("Opción no válida");
+	            		break;
+                }
+            }
 		}
-
-	}
-	private static Queue crearCola(String name) throws JMSException {
-		return new com.sun.messaging.Queue(name);
-	}
-	private static void enviarMensaje(Session mySess, Queue cola, String msg) throws JMSException {
-		// Productor
-		MessageProducer myMsgProducer = mySess.createProducer(cola);
-		// Enviamos mensaje
-        TextMessage myTextMsg = mySess.createTextMessage();
-        myTextMsg.setText(msg);
-        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " + cola.getQueueName());
-        myMsgProducer.send(myTextMsg);
-	}
-	
-	private static Message recibirMensaje(Session mySess, Queue cola, Connection myConn) throws JMSException {
-		System.out.println("Waiting for Message... ");
-		// Consumidor
-		MessageConsumer myMsgConsumer = mySess.createConsumer(cola);
-		myConn.start();
-		return myMsgConsumer.receive();
-	}
-	private static String uniqueName() {
-		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-		return bean.getName().split("@")[1] + bean.getName().replace("@", "");
+    	catch (Exception jmse) {
+            jmse.printStackTrace();
+            System.exit(1);
+		}
 	}
 }
