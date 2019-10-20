@@ -6,68 +6,63 @@ import java.lang.management.RuntimeMXBean;
 
 public class Client {
 	public static void main(String[] args) {
-		System.out.println("EL CLIENTE ");
-		/* Ejemplo de login
-		 * SINCRONO
-		 */
+		System.out.println("CLIENTE ");
         try {
             ConnectionFactory myConnFactory;
-            // Cola de usuarios
- 			Queue usuarios = crearCola("usuarios");
  	        // Conexion
             myConnFactory = new com.sun.messaging.ConnectionFactory();
             Connection myConn = myConnFactory.createConnection();
             // Sesion
             Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            // Nombre unico
-            String qname = uniqueName();
-            // Enviamos mensaje
-            enviarMensaje(mySess, usuarios, qname);
-            
-            System.out.println("\tSe han creado colas SC y CS");
-			// Cola Cliente-Servidor
-			Queue colaCS = crearCola("CS" + qname);
-			// Cola Servidor-Cliente
-			Queue colaSC = crearCola("SC" + qname);
-			
-            // Bucle de espera
- 			while(true){
-				Message msg = recibirMensaje(mySess, colaSC, myConn);
- 				// si recibimos mensaje
- 				if (msg instanceof TextMessage) {
- 					TextMessage txtMsg = (TextMessage) msg;
- 					System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaSC.getQueueName());
- 					break;
- 				}
- 			}
- 			/* Aquí se pedirian el resto de operaciones
- 			 * Las solicitudes se envian por colaCS
- 			 */
- 			// Ejemplo de matar
-            enviarMensaje(mySess, colaCS, "KILL");
+            // TODO: Hacer el switch aquí y llamar a request
+            request("FiltrarTematica", mySess, myConn);
 
             System.out.println("FIN!");
             // Cerramos sesion y conexion
             mySess.close();
             myConn.close();
 
-        } catch (Exception jmse) {
-            System.out.println("Exception occurred : " + jmse.toString());
+        } 
+        catch (Exception jmse) {
             jmse.printStackTrace();
+            System.exit(1);
         }
     }
+	
+	/**Crea una cola
+	 * @param name: nombre de la cola
+	 * @return la cola creada
+	 * @throws JMSException
+	 */
 	private static Queue crearCola(String name) throws JMSException {
 		return new com.sun.messaging.Queue(name);
 	}
+	
+	/** Envia un mensaje a una cola 
+	 * @param mySess: sesión
+	 * @param cola: cola
+	 * @param msg: mensaje a enviar
+	 * @throws JMSException
+	 */
 	private static void enviarMensaje(Session mySess, Queue cola, String msg) throws JMSException {
 		// Productor
 		MessageProducer myMsgProducer = mySess.createProducer(cola);
 		// Enviamos mensaje
         TextMessage myTextMsg = mySess.createTextMessage();
         myTextMsg.setText(msg);
+	    myTextMsg.setJMSReplyTo(cola);
         System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " + cola.getQueueName());
+	    myTextMsg.setJMSReplyTo(cola);
         myMsgProducer.send(myTextMsg);
 	}
+	
+	/** Recibe un mensaje de una cola 
+	 * @param mySess: sesión
+	 * @param cola: cola de escucha
+	 * @param myConn: conexión
+	 * @return mensaje
+	 * @throws JMSException
+	 */
 	private static Message recibirMensaje(Session mySess, Queue cola, Connection myConn) throws JMSException {
 		System.out.println("Waiting for Message... ");
 		// Consumidor
@@ -75,8 +70,42 @@ public class Client {
 		myConn.start();
 		return myMsgConsumer.receive();
 	}
-	private static String uniqueName() {
+	
+	/**Se genera un nombre con la siguiente estructura
+	 * concatenación de númeroPID y nombre ssoo
+	 * @param op: operación de la solicitud
+	 * @return String nombre único
+	 */
+	private static String uniqueName(String op) {
 		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-		return bean.getName().split("@")[1] + bean.getName().replace("@", "");
+		return op + bean.getName().split("[a-zA-Z]+")[0].replace("@", "").replace("-", "") + op;
+	}
+	
+	/**
+	 * 
+	 * @param operation: operaciones permitidas -> FiltrarFecha, FiltrarPalabraClave o FiltrarTematica
+	 * @param mySess: sesión
+	 * @param myConn: conexión
+	 * @throws JMSException
+	 */
+	private static void request(String operation, Session mySess, Connection myConn) throws JMSException {
+		// Cola "usuarios"
+		Queue usuarios = crearCola("usuarios");
+		// Nombre unico
+		String qname = uniqueName(operation);
+		// Enviamos mensaje
+		enviarMensaje(mySess, usuarios, qname);
+		// Cola Servidor-Cliente
+		Queue colaSC = crearCola(qname);
+		// Bucle de espera
+		while(true){
+			Message msg = recibirMensaje(mySess, colaSC, myConn);
+			// si recibimos mensaje
+			if (msg instanceof TextMessage) {
+				TextMessage txtMsg = (TextMessage) msg;
+				System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaSC.getQueueName());
+				break;
+			}
+		}
 	}
 }
