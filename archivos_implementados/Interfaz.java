@@ -51,8 +51,8 @@ public class Interfaz
 		String fechafin = sc.next();
 		if((fechaini.equals("NO"))&&(fechafin.equals("NO")))
 		{
-			System.out.println("\nNo hay fecha especifica, salen todas las noticias\n");
-			/*llamada para todas las noticias*/
+			System.out.println("\nNo hay fechas especificas... Saliendo...\n");
+			/*logout*/
 			break;
 		} else if(fechaini.equals("NO"))
 		{
