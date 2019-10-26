@@ -11,7 +11,7 @@ Si no tienes instalado el broker, puedes instalarlo ejecutando el siguiente coma
 ```sh
 unzip scripts/openmq5_1_1.zip
 ```
-Esto creará la carpeta _mq_ en el directorio raiz y te permitirá ejecutar el script _run_broker.sh_.
+Esto creará la carpeta _mq_ en el directorio raiz del proyecto y te permitirá ejecutar el script _run_broker.sh_.
 
 ## Ejecución de la aplicación
 Cada comando ha de ejecutarse en **distintos terminales**.
