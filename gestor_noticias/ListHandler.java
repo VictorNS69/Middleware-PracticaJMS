@@ -80,7 +80,7 @@ public class ListHandler {
 	public List<Noticia> get_cat_economia() {
 		return cat_economia;
 	}
-	private List<Noticia> all_news_with_keyword(String keyword) {
+	public List<Noticia> all_news_with_keyword(String keyword) {
 		List<Noticia> resultado = new ArrayList();
 		if(keyWords_map.containsKey(keyword)) {
 			resultado = keyWords_map.get(keyword);
