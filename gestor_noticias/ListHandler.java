@@ -80,12 +80,91 @@ public class ListHandler {
 	public List<Noticia> get_cat_economia() {
 		return cat_economia;
 	}
+	public List<Noticia> get_from_date(String start,String end){
+//---- DOCUMENTACION DE FUNCIÓN ----//
+//---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
+//---- START 	--> Fecha mas antigua
+//---- END 		--> Fecha mas reciente
+//---- Devolvemos lo que esté entre medias.
+		int start_c = date_to_int(start);
+		int end_c = date_to_int(end);
+		List<Noticia> resultado = new ArrayList();
+		int fecha_noticia = 0;
+//---- Recorremos toda la lista
+		for(int i=total_noticias.size()-1;i>=0;i++) {
+			fecha_noticia = total_noticias.get(i).getFecha_c();
+//---- Añadimos a resultado si: 
+//---- fecha_noticia es mas reciente que START
+//---- fecha_noticia es mas antigua que END
+			if(fecha_noticia < start_c && fecha_noticia >end_c) {
+				resultado.add(total_noticias.get((i)));
+			}
+		}
+		return resultado;
+	}
+	public List<Noticia> get_from_start(String start,String end){
+//---- DOCUMENTACION DE FUNCIÓN ----//
+//---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
+//---- START 	--> Fecha mas antigua
+//---- END 		--> Fecha mas reciente
+//---- Devolvemos lo que esté entre medias.
+		int start_c = date_to_int(start);
+		int end_c = date_to_int(end);
+		List<Noticia> resultado = new ArrayList();
+		int fecha_noticia = 0;
+//---- Recorremos toda la lista
+		for(int i=total_noticias.size()-1;i>=0;i++) {
+			fecha_noticia = total_noticias.get(i).getFecha_c();
+//---- Añadimos a resultado si: 
+//---- fecha_noticia es mas reciente que START
+			if(fecha_noticia < start_c ) {
+				resultado.add(total_noticias.get((i)));
+			}
+		}
+		return resultado;
+	}
+	public List<Noticia> get_from_end(String start,String end){
+//---- DOCUMENTACION DE FUNCIÓN ----//
+//---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
+//---- START 	--> Fecha mas antigua
+//---- END 		--> Fecha mas reciente
+//---- Devolvemos lo que esté entre medias.
+		int start_c = date_to_int(start);
+		int end_c = date_to_int(end);
+		List<Noticia> resultado = new ArrayList();
+		int fecha_noticia = 0;
+//---- Recorremos toda la lista
+		for(int i=total_noticias.size()-1;i>=0;i++) {
+			fecha_noticia = total_noticias.get(i).getFecha_c();
+//---- Añadimos a resultado si: 
+//---- fecha_noticia es mas antigua que END
+			if(fecha_noticia >end_c) {
+				resultado.add(total_noticias.get((i)));
+			}
+		}
+		return resultado;
+	}
+	
+	
+	
+	
+	
+	
 	public List<Noticia> all_news_with_keyword(String keyword) {
 		List<Noticia> resultado = new ArrayList();
 		if(keyWords_map.containsKey(keyword)) {
 			resultado = keyWords_map.get(keyword);
 		}
 		return resultado;
+	}
+	private int date_to_int (String s_fecha) {
+		String[] a_fecha = s_fecha.split("-",3);
+		int resultado = 0;
+		resultado += Integer.parseInt(a_fecha[2])*10000;
+		resultado += Integer.parseInt(a_fecha[1])*100;
+		resultado += Integer.parseInt(a_fecha[0]);
+		return resultado;
+		
 	}
 
 }
