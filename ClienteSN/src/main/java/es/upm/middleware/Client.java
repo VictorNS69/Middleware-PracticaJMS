@@ -1,26 +1,139 @@
 package es.upm.middleware;
 
-import javax.jms.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Scanner;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+
 
 public class Client {
+	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 		System.out.println("CLIENTE ");
-        try {
-            // TODO: Hacer el switch aquí y llamar a request
-        	// TODO: Controlar tematica Free o Premium
-        	request("FiltrarTematica", "Free");
+		try {
+			Scanner scN = new Scanner(System.in);
+			System.out.println("\nNombre de Usuario\n");
+			String nombre = scN.nextLine();
+			// TODO: Manejar suscripcion desde cliente
+			System.out.println("\nSuscripción Free o Premium?\n");
+			Scanner scS = new Scanner(System.in);
+			String suscripcion = scS.nextLine();
+			while(true) {
+				System.out.println("\nComo desea filtrar sus noticias?\n\t[1]Por Tematica\n\t[2]Por Palabra Clave\n\t[3]Por Fecha\n\t[4]Salir");
+				Scanner sc = new Scanner(System.in);
+				int filtro = sc.nextInt(); 
+				switch(filtro){
+				case 1:
+					System.out.println("\nTematica?\n\t[1]Politica\n\t[2]Economia\n\t[3]Deportes\n");
+					Scanner scF = new Scanner(System.in);
+					int tema = scF.nextInt();
+					switch(tema){
+						case 1:
+							request("FiltrarTematica", "POLITICA", suscripcion);
+							break;
+						case 2:
+							request("FiltrarTematica", "ECONOMIA", suscripcion);
+							break;
+						case 3:
+							request("FiltrarTematica", "DEPORTES", suscripcion);
+							break;
+						default:
+							System.out.println("Entrada no valida.\n");
+							break;
+					}
+					break;
+				case 2:
+					System.out.println("\nIntroduzca Palabra Clave\n");
+					Scanner sck = new Scanner(System.in);
+					String keyk = sck.nextLine();
+					request("FiltrarPalabraClave", keyk, suscripcion);
+					break;
+				case 3:
+					// TODO: Filtrar fechas
+					boolean res=true;
+					String cadena = "NO";
+					System.out.println("\nIntroduzca Fecha: Formato DD/MM/YYYY, si no desea filtrar en algun caso, escriba NO");
+					System.out.println("\nFecha Inicio? Si se especifica, se serviran noticias posteriores a esta fecha\n");
+					String fechaini = sc.next();
+					System.out.println("\nFecha Final? Si se especifica, se serviran noticias anteriores a esta fecha\n");
+					String fechafin = sc.next();
+					if((fechaini.equals("NO"))&&(fechafin.equals("NO"))){
+						System.out.println("\nNo hay fecha especifica, no se realiza ninguna busqueda.\n");
+						break;
+					} 
+					else if(fechaini.equals("NO")){
+						res=validarFecha(fechafin);
+						if(res==false){
+							System.out.println("\nFormato de fecha invalido... Saliendo...");
+							/*logout*/
+							break;
+						} 
+						else {
+							System.out.println("\nNoticias anteriores:\n");
+							/*llamada con fechafin*/
+						}
+					} 
+					else if(fechafin.equals("NO")){
+						res=validarFecha(fechaini);
+						if(res==false){
+							System.out.println("\nFormato de fecha invalido... Saliendo...");
+							/*logout*/
+							break;
+						} 
+						else {
+							System.out.println("\nNoticias posteriores:\n");
+							/*llamada con fechaini*/
+						}
+					} 
+					else{
+						res=validarFecha(fechafin);
+						if(res==false){
+							System.out.println("\nFormato de fecha invalido... Saliendo...");
+							/*logout*/
+							break;
+						}
+						res=validarFecha(fechaini);
+						if(res==false){
+							System.out.println("\nFormato de fecha invalido... Saliendo...");
+							/*logout*/
+							break;
+						} 
+						else {
+							System.out.println("\nNoticias entre "+fechaini+" y "+fechafin+"\n");
+							/*llamada con fechaini y fechafin*/
+						}
 
-            System.out.println("FIN!");
+					}
+					break;
+				case 4:
+					System.out.println("\nSaliendo del sistema.");
+					System.exit(1);
+				default:
+					System.out.println("\nOpcion no valida\n");
+					break;
+				}
+			}
+		}
+		catch (Exception jmse) {
+			jmse.printStackTrace();
+			System.exit(1);
+		}
+	}
 
-        } 
-        catch (Exception jmse) {
-            jmse.printStackTrace();
-            System.exit(1);
-        }
-    }
-	
 	/**Crea una cola
 	 * @param name: nombre de la cola
 	 * @return la cola creada
@@ -29,7 +142,7 @@ public class Client {
 	private static Queue crearCola(String name) throws JMSException {
 		return new com.sun.messaging.Queue(name);
 	}
-	
+
 	/** Envia un mensaje a una cola 
 	 * @param mySess: sesión
 	 * @param cola: cola
@@ -40,14 +153,14 @@ public class Client {
 		// Productor
 		MessageProducer myMsgProducer = mySess.createProducer(cola);
 		// Enviamos mensaje
-        TextMessage myTextMsg = mySess.createTextMessage();
-        myTextMsg.setText(msg);
-	    myTextMsg.setJMSReplyTo(cola);
-        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " + cola.getQueueName());
-	    myTextMsg.setJMSReplyTo(cola);
-        myMsgProducer.send(myTextMsg);
+		TextMessage myTextMsg = mySess.createTextMessage();
+		myTextMsg.setText(msg);
+		myTextMsg.setJMSReplyTo(cola);
+		System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " + cola.getQueueName());
+		myTextMsg.setJMSReplyTo(cola);
+		myMsgProducer.send(myTextMsg);
 	}
-	
+
 	/** Recibe un mensaje de una cola 
 	 * @param mySess: sesión
 	 * @param cola: cola de escucha
@@ -64,7 +177,7 @@ public class Client {
 		myConn.stop();
 		return msg;
 	}
-	
+
 	/**Se genera un nombre con la siguiente estructura
 	 * concatenación de númeroPID y nombre ssoo
 	 * @param op: operación de la solicitud
@@ -74,7 +187,7 @@ public class Client {
 		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
 		return op + bean.getName().split("[a-zA-Z]+")[0].replace("@", "").replace("-", "") + suscription;
 	}
-	
+
 	/**
 	 * 
 	 * @param operation: operaciones permitidas -> FiltrarFecha, FiltrarPalabraClave o FiltrarTematica
@@ -82,32 +195,72 @@ public class Client {
 	 * @param myConn: conexión
 	 * @throws JMSException
 	 */
-	private static void request(String operation, String suscription) throws JMSException {
-        ConnectionFactory myConnFactory;
-	    // Conexion
-        myConnFactory = new com.sun.messaging.ConnectionFactory();
-        Connection myConn = myConnFactory.createConnection();
-        // Sesion
-        Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+	private static void request(String operation, String arguments, String subscription) throws JMSException {
+		ConnectionFactory myConnFactory;
+		// Conexion
+		myConnFactory = new com.sun.messaging.ConnectionFactory();
+		Connection myConn = myConnFactory.createConnection();
+		// Sesion
+		Session mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		// Cola "usuarios"
 		Queue usuarios = crearCola("usuarios");
 		// Nombre unico
-		String qname = uniqueName(operation, suscription);
+		String qname = uniqueName(operation, arguments);
 		// Enviamos mensaje
 		enviarMensaje(mySess, usuarios, qname);
 		// Cola Servidor-Cliente
 		Queue colaSC = crearCola(qname);
 		// Bucle de espera
-		while(true){
+		boolean received = false;
+		while(!received){
 			Message msg = recibirMensaje(mySess, colaSC, myConn);
 			// si recibimos mensaje
 			if (msg instanceof TextMessage) {
 				TextMessage txtMsg = (TextMessage) msg;
-				System.out.println("Read Message: " + txtMsg.getText() + "\tfrom queue: " + colaSC.getQueueName());
+				readJson(txtMsg, subscription);
+				received = true;
 				myConn.close();
 				mySess.close();
 				break;
 			}
 		}
 	}
+
+	private static void readJson(TextMessage msg, String subscription) throws JsonSyntaxException, JMSException {
+		if (msg.getText() == null || msg.getText().isEmpty() || msg.getText().equals("[]")) {
+			System.out.println("\tNo hay noticias");
+			return;
+		}
+		JsonParser jp = new JsonParser();
+		JsonArray ofs = jp.parse(msg.getText()).getAsJsonArray();
+		for (int i = 0; i < ofs.size(); i++) {
+			String replace =  ofs.get(i).toString().replace("\\", "").replace("\"", "")
+					.replace("{", "").replace("}", "");
+			String [] contenido = replace.split(",contenido:");
+			String [] palabras = contenido[0].split(",palabras_clave:");
+			String [] categoria = palabras[0].split(",categoria:");
+			String [] fecha = categoria[0].split(",fecha:");
+			String [] nombre = fecha[0].split("nombre:");
+			System.out.println("\n\tTitulo: " + nombre[1] + "\n\tFecha: " + fecha[1]
+					+ "\n\tCategoria: "+ categoria[1] + "\n\tPalabras Clave: " + 
+					palabras[1].replace("[", "").replace("]", "").replace(",", ", "));
+			if (subscription.toLowerCase().equals("premium")) {
+				System.out.println("\tContenido: " + contenido[1]);
+			}
+		}
+	}
+	
+	public static boolean validarFecha(String fecha) {
+		try 
+		{
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+			formatoFecha.setLenient(false);
+			formatoFecha.parse(fecha);
+		} catch (ParseException e) 
+		{
+			return false;
+		}
+		return true;
+	}
+
 }
