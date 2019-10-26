@@ -10,6 +10,8 @@ public class ListHandler {
 	private static List<Noticia> cat_deporte = new ArrayList();
 	private HashMap<String,List> keyWords_map = new HashMap();
 	
+	
+	
 	public boolean importar_noticia (Noticia noticia) {
 		//---- Importamos la noticia según categoría ----//
 		if(!add_list_categoria(noticia))
@@ -62,7 +64,6 @@ public class ListHandler {
 		if(!terminado) {
 			total_noticias.add(noticia);
 		}
-
 	}
 	
 	
@@ -79,15 +80,12 @@ public class ListHandler {
 	public List<Noticia> get_cat_economia() {
 		return cat_economia;
 	}
-	private ArrayList all_news_with_keyword(String keyword) {
-		return null;
+	private List<Noticia> all_news_with_keyword(String keyword) {
+		List<Noticia> resultado = new ArrayList();
+		if(keyWords_map.containsKey(keyword)) {
+			resultado = keyWords_map.get(keyword);
+		}
+		return resultado;
 	}
-	
-	
-	private void gestion_total_noticias (Noticia noticia) {
-		//TO DO: Implementar un metodo que coloque la noticia en su lugar
-	}
-
-
 
 }
