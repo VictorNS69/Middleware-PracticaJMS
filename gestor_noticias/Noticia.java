@@ -57,8 +57,9 @@ public class Noticia {
 	
 	
 	
-	
-	
+	public String toString () {
+		return this.nombre;
+	}
 	
 	public void setFecha(String date) {
 		this.fecha = date;
@@ -73,9 +74,7 @@ public class Noticia {
 	public void setContenido (String content) {
 		this.contenido = content;
 	}
-	public String toString () {
-		return this.nombre;
-	}
+
 	public String getNombre () {
 		return nombre;
 	}

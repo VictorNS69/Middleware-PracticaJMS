@@ -1,6 +1,6 @@
 package gestor_noticias;
 
-import java.util.*;;
+import java.util.*;
 
 public class ListHandler {
 	private static List<Noticia> total_noticias  = new ArrayList(); //Lista de noticias
@@ -80,6 +80,8 @@ public class ListHandler {
 	public List<Noticia> get_cat_economia() {
 		return cat_economia;
 	}
+	
+	
 	public List<Noticia> get_from_date(String start,String end){
 //---- DOCUMENTACION DE FUNCIÓN ----//
 //---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
@@ -91,7 +93,7 @@ public class ListHandler {
 		List<Noticia> resultado = new ArrayList();
 		int fecha_noticia = 0;
 //---- Recorremos toda la lista
-		for(int i=total_noticias.size()-1;i>=0;i++) {
+		for(int i=total_noticias.size()-1;i>=0;i--) {
 			fecha_noticia = total_noticias.get(i).getFecha_c();
 //---- Añadimos a resultado si: 
 //---- fecha_noticia es mas reciente que START
@@ -102,18 +104,15 @@ public class ListHandler {
 		}
 		return resultado;
 	}
-	public List<Noticia> get_from_start(String start,String end){
+	public List<Noticia> get_older_than(String start){
 //---- DOCUMENTACION DE FUNCIÓN ----//
 //---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
-//---- START 	--> Fecha mas antigua
-//---- END 		--> Fecha mas reciente
-//---- Devolvemos lo que esté entre medias.
+//---- Devolvemos las noticias mas antiguas que la fecha indicada
 		int start_c = date_to_int(start);
-		int end_c = date_to_int(end);
 		List<Noticia> resultado = new ArrayList();
 		int fecha_noticia = 0;
 //---- Recorremos toda la lista
-		for(int i=total_noticias.size()-1;i>=0;i++) {
+		for(int i=total_noticias.size()-1;i>=0;i--) {
 			fecha_noticia = total_noticias.get(i).getFecha_c();
 //---- Añadimos a resultado si: 
 //---- fecha_noticia es mas reciente que START
@@ -123,22 +122,19 @@ public class ListHandler {
 		}
 		return resultado;
 	}
-	public List<Noticia> get_from_end(String start,String end){
+	public List<Noticia> get_newer_than(String date){
 //---- DOCUMENTACION DE FUNCIÓN ----//
 //---- (fecha1_c < fecha2_c) implica que fecha1 es MAS ANTIGUA
-//---- START 	--> Fecha mas antigua
-//---- END 		--> Fecha mas reciente
-//---- Devolvemos lo que esté entre medias.
-		int start_c = date_to_int(start);
-		int end_c = date_to_int(end);
+//---- Devolvemos las noticias mas recientes que la indicada
+		int date_c = date_to_int(date);
 		List<Noticia> resultado = new ArrayList();
 		int fecha_noticia = 0;
 //---- Recorremos toda la lista
-		for(int i=total_noticias.size()-1;i>=0;i++) {
+		for(int i=total_noticias.size()-1;i>=0;i--) {
 			fecha_noticia = total_noticias.get(i).getFecha_c();
 //---- Añadimos a resultado si: 
-//---- fecha_noticia es mas antigua que END
-			if(fecha_noticia >end_c) {
+//---- fecha_noticia es mas nueva que la fecha indicada.
+			if(fecha_noticia > date_c) {
 				resultado.add(total_noticias.get((i)));
 			}
 		}
@@ -149,14 +145,20 @@ public class ListHandler {
 	
 	
 	
+	public String keywords_on_map(){
+		String resultado;
+		resultado = keyWords_map.keySet().toString();
+		return resultado;
+	}
 	
-	public List<Noticia> all_news_with_keyword(String keyword) {
+	public List<Noticia> get_news_with_keyword(String keyword) {
 		List<Noticia> resultado = new ArrayList();
 		if(keyWords_map.containsKey(keyword)) {
 			resultado = keyWords_map.get(keyword);
 		}
 		return resultado;
 	}
+
 	private int date_to_int (String s_fecha) {
 		String[] a_fecha = s_fecha.split("-",3);
 		int resultado = 0;
