@@ -6,7 +6,7 @@ import java.io.*;
 public class Noticia {
 	private String nombre;// #1
 	private int fecha_c; // #2 FORMATO YYYYMMDD (Formato para organizar de manera rápida)
-	private String fecha;
+	private String fecha;  //FORMATO DD-MM-YYYY (FORMATO PARA IMPORTAR NOTICIAS)
 	private String categoria; // #3 POLITICA/ECONOMIA/DEPORTES
 	private String[] palabras_clave; //#4 - SEPARADAS POR ## 
 	private String contenido;
