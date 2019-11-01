@@ -31,29 +31,55 @@ public class Server {
     		if (message instanceof TextMessage) {
     	        TextMessage requestMessage = (TextMessage) message;
                 try {
-				    System.out.println("Read Message: " + requestMessage.getText() + "\tfrom queue: usuarios" );
+				    //System.out.println("Read Message: " + requestMessage.getText() + "\tfrom queue: usuarios" );
 					// Cola de la petición
 				    String[] split = requestMessage.getText().split("\\d+");
+				    String[] auxSPlit = requestMessage.getText().split("XX");
 				    
 				    String operation = split[0];
 				    String arguments = split[1];
-				    
-				    System.out.println("operación: " + operation + " Arguments: " + arguments);
-				    
+				    				    				    
 				    // Cola Cliente-Servidor
 				    Queue colaSC = new com.sun.messaging.Queue(requestMessage.getText());
-				    System.out.println("Se enviará a la cola " + colaSC.getQueueName());
+				    //System.out.println("Se enviará a la cola " + colaSC.getQueueName());
 				    
 					MessageProducer myMsgProducer = mySess.createProducer(colaSC);
 			        TextMessage myTextMsg = mySess.createTextMessage();
 
-				    if (operation.equals("FiltrarFecha")) {
-				    	System.out.println("Solicitud de Filtrar por Fecha");
-				    	// TODO: procesar solicitud y cambiar myTextMsg.setText(solucion)
-				    	myTextMsg.setText("Solicitud de Filtrar por Fecha");
+				    if (operation.equals("FiltrarFechaFin")) {
+				    	String auxDate = auxSPlit[1].substring(auxSPlit[1].length() - 8);
+				    	String finalDate = auxDate.substring(0,2) + "-" + auxDate.substring(2,4) 
+				    		+ "-" + auxDate.substring(auxDate.length() - 4);
+				    	JsonArray jsonArr = new JsonArray();
+				    	for (Noticia n: LH.get_older_than(finalDate)) {
+							jsonArr.add(n.toString());
+						}
+						myTextMsg.setText(jsonArr.toString());
+				    }
+				    else if (operation.equals("FiltrarFechaInicio")) {
+				    	String auxDate = auxSPlit[1].substring(auxSPlit[1].length() - 8);
+				    	String finalDate = auxDate.substring(0,2) + "-" + auxDate.substring(2,4) 
+				    		+ "-" + auxDate.substring(auxDate.length() - 4);
+				    	JsonArray jsonArr = new JsonArray();
+				    	for (Noticia n: LH.get_newer_than(finalDate)) {
+							jsonArr.add(n.toString());
+						}
+						myTextMsg.setText(jsonArr.toString());
+				    }
+				    else if (operation.equals("FiltrarFecha")) {
+				    	String date1 = auxSPlit[1].substring(0, 8);
+				    	String date2 = auxSPlit[1].substring(auxSPlit[1].length() - 8);
+				    	String finalDate1 = date1.substring(0,2) + "-" + date1.substring(2,4) 
+			    		+ "-" + date1.substring(date1.length() - 4);
+				    	String finalDate2 = date2.substring(0,2) + "-" + date2.substring(2,4) 
+				    		+ "-" + date2.substring(date2.length() - 4);
+				    	JsonArray jsonArr = new JsonArray();
+				    	for (Noticia n: LH.get_from_date(finalDate1, finalDate2)) {
+							jsonArr.add(n.toString());
+						}
+						myTextMsg.setText(jsonArr.toString());
 				    }
 				    else if (operation.equals("FiltrarPalabraClave")) {
-				    	System.out.println("Solicitud de Filtrar por Palabra Clave");
 						JsonArray jsonArr = new JsonArray();
 				    	for (Noticia n: LH.get_news_with_keyword(arguments)) {
 							jsonArr.add(n.toString());
@@ -61,9 +87,7 @@ public class Server {
 						myTextMsg.setText(jsonArr.toString());
 				    }
 				    else if (operation.equals("FiltrarTematica")) {
-				    	System.out.println("Solicitud de Filtrar por Temática");
 						JsonArray jsonArr = new JsonArray();
-
 				    	switch (arguments) {
 							case "POLITICA":
 								for (Noticia n: LH.get_cat_politica()) {
@@ -84,15 +108,14 @@ public class Server {
 								myTextMsg.setText(jsonArr.toString());
 								break;
 							default:
-								System.out.println("No se tienen datos de la categoria: " + arguments);
+								myTextMsg.setText("No se tienen datos de esa categoria");
 								break;
 						}
 				    }
 				    else {
-				    	System.out.println("No se ha entendido la petición: " + operation);
 				        myTextMsg.setText("No se ha entendido la solicitud: " + operation);
 				    }
-			        System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " +  colaSC.getQueueName());
+			        //System.out.println("Sending Message: " + myTextMsg.getText() + "\tto queue: " +  colaSC.getQueueName());
 			        myMsgProducer.send(myTextMsg);
 				}
                 catch (JMSException e) {
@@ -107,7 +130,6 @@ public class Server {
 		try {
 			// Gestor de noticias
         	LH = new ListHandler();
-        	
 			ConnectionFactory myConnFactory;
 			// Cola de usuarios
 			Queue usuarios = new com.sun.messaging.Queue("usuarios");
@@ -115,8 +137,7 @@ public class Server {
 			myConnFactory = new com.sun.messaging.ConnectionFactory();
 			myConn = myConnFactory.createConnection();
             // Sesion
-			mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			
+			mySess = myConn.createSession(false, Session.AUTO_ACKNOWLEDGE);	
 			// Escuchar en "usuarios"
 			MessageConsumer myMsgConsumer = mySess.createConsumer(usuarios);
 			TextListenerUsuarios textListener = new TextListenerUsuarios();
@@ -141,7 +162,7 @@ public class Server {
                 switch(operation) {
 	                case 1:
 	                	System.out.println("Añadir noticia terminal \n#TODO");
-	                	//TODO: Quitar también TODO del print
+	                	//TODO: 
 	                	break;
 	                case 2:
 	                	System.out.println("Añadir noticia desde un fichero \nEscribe la ruta GLOBAL");
@@ -150,14 +171,13 @@ public class Server {
 	                	try {
 		                	Noticia noticia = new Noticia(path);
 		                	LH.importar_noticia(noticia);
+		                	System.out.println("La noticia se ha importado correctamente");
 						} catch (Exception e) {
 							System.out.println(e);
 						}
 	                	break;
 	                case 3:
 	                	System.out.println("\tSalir");
-	                	// TODO: BORRAR PRINT
-	                	System.out.println("Todas las noticias: "+ LH.get_total_noticas());
 	                    mySess.close();
 	                    myConn.close();
 	                    sc.close();

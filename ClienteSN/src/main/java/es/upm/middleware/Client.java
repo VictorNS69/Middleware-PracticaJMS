@@ -63,58 +63,55 @@ public class Client {
 					request("FiltrarPalabraClave", keyk, suscripcion);
 					break;
 				case 3:
-					// TODO: Filtrar fechas
-					boolean res=true;
-					String cadena = "NO";
-					System.out.println("\nIntroduzca Fecha: Formato DD/MM/YYYY, si no desea filtrar en algun caso, escriba NO");
-					System.out.println("\nFecha Inicio? Si se especifica, se serviran noticias posteriores a esta fecha\n");
-					String fechaini = sc.next();
-					System.out.println("\nFecha Final? Si se especifica, se serviran noticias anteriores a esta fecha\n");
-					String fechafin = sc.next();
-					if((fechaini.equals("NO"))&&(fechafin.equals("NO"))){
+					boolean res = true;
+					System.out.println("\nIntroduzca Fecha: Formato DD-MM-YYYY.\nSi no desea filtrar en algun caso, escriba NO");
+					System.out.println("\nFecha Inicio? \nSi se especifica, se serviran noticias posteriores a esta fecha\n");
+					Scanner scfi = new Scanner(System.in);
+					String fechaini = scfi.next();
+					System.out.println("\nFecha Final? \nSi se especifica, se serviran noticias anteriores a esta fecha\n");
+					Scanner scff = new Scanner(System.in);
+					String fechafin = scff.next();
+					if((fechaini.toUpperCase().equals("NO"))&&(fechafin.toUpperCase().equals("NO"))){
 						System.out.println("\nNo hay fecha especifica, no se realiza ninguna busqueda.\n");
 						break;
 					} 
-					else if(fechaini.equals("NO")){
+					else if(fechaini.toUpperCase().equals("NO")){
 						res=validarFecha(fechafin);
 						if(res==false){
-							System.out.println("\nFormato de fecha invalido... Saliendo...");
-							/*logout*/
+							System.out.println("\nFormato de fecha invalido.");
 							break;
 						} 
 						else {
 							System.out.println("\nNoticias anteriores:\n");
-							/*llamada con fechafin*/
+							request("FiltrarFechaFin", "XX"+fechafin.replace("-", "")+"XX", suscripcion);
 						}
 					} 
-					else if(fechafin.equals("NO")){
+					else if(fechafin.toUpperCase().equals("NO")){
 						res=validarFecha(fechaini);
 						if(res==false){
-							System.out.println("\nFormato de fecha invalido... Saliendo...");
-							/*logout*/
+							System.out.println("\nFormato de fecha invalido.");
 							break;
 						} 
 						else {
 							System.out.println("\nNoticias posteriores:\n");
-							/*llamada con fechaini*/
+							request("FiltrarFechaInicio", "XX"+fechaini.replace("-", "")+"XX", suscripcion);
 						}
 					} 
 					else{
 						res=validarFecha(fechafin);
 						if(res==false){
-							System.out.println("\nFormato de fecha invalido... Saliendo...");
-							/*logout*/
+							System.out.println("\nFormato de fecha invalido.");
 							break;
 						}
 						res=validarFecha(fechaini);
 						if(res==false){
-							System.out.println("\nFormato de fecha invalido... Saliendo...");
-							/*logout*/
+							System.out.println("\nFormato de fecha invalido.");
 							break;
 						} 
 						else {
-							System.out.println("\nNoticias entre "+fechaini+" y "+fechafin+"\n");
-							/*llamada con fechaini y fechafin*/
+							System.out.println("\nNoticias entre " + fechaini + " y " + fechafin + "\n");
+							request("FiltrarFecha", "XX"+fechaini.replace("-", "")+ "YY" 
+									+ fechafin.replace("-", "") +"XX", suscripcion);
 						}
 
 					}
@@ -251,7 +248,7 @@ public class Client {
 	
 	public static boolean validarFecha(String fecha) {
 		try {
-			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
 			formatoFecha.setLenient(false);
 			formatoFecha.parse(fecha);
 		} 

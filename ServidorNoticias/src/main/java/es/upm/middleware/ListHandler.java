@@ -89,9 +89,9 @@ public class ListHandler {
 		int end_c = date_to_int(end);
 		List<Noticia> resultado = new ArrayList();
 		int fecha_noticia = 0;
-		for(int i=total_noticias.size()-1;i>=0;i--) {
+		for(int i=total_noticias.size()-1; i>=0; i--) {
 			fecha_noticia = total_noticias.get(i).getFecha_c();
-			if(fecha_noticia < start_c && fecha_noticia >end_c) {
+			if(fecha_noticia > start_c && fecha_noticia < end_c) {
 				resultado.add(total_noticias.get((i)));
 			}
 		}
