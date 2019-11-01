@@ -27,8 +27,8 @@ public class Client {
 		try {
 			Scanner scN = new Scanner(System.in);
 			System.out.println("\nNombre de Usuario\n");
+			@SuppressWarnings("unused")
 			String nombre = scN.nextLine();
-			// TODO: Manejar suscripcion desde cliente
 			System.out.println("\nSuscripción Free o Premium?\n");
 			Scanner scS = new Scanner(System.in);
 			String suscripcion = scS.nextLine();
@@ -188,8 +188,7 @@ public class Client {
 		return op + bean.getName().split("[a-zA-Z]+")[0].replace("@", "").replace("-", "") + suscription;
 	}
 
-	/**
-	 * 
+	/** Hace una solicitud de operación y espera la respuesta
 	 * @param operation: operaciones permitidas -> FiltrarFecha, FiltrarPalabraClave o FiltrarTematica
 	 * @param mySess: sesión
 	 * @param myConn: conexión
@@ -251,16 +250,14 @@ public class Client {
 	}
 	
 	public static boolean validarFecha(String fecha) {
-		try 
-		{
+		try {
 			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
 			formatoFecha.setLenient(false);
 			formatoFecha.parse(fecha);
-		} catch (ParseException e) 
-		{
+		} 
+		catch (ParseException e){
 			return false;
 		}
 		return true;
 	}
-
 }

@@ -54,10 +54,11 @@ public class Server {
 				    }
 				    else if (operation.equals("FiltrarPalabraClave")) {
 				    	System.out.println("Solicitud de Filtrar por Palabra Clave");
-				    	// TODO: No funciona creo
-				    	System.out.println(LH.all_news_with_keyword(arguments)); // TODO: Borrar print
-				    	myTextMsg.setText("Solicitud de Filtrar por Palabra Clave");
-
+						JsonArray jsonArr = new JsonArray();
+				    	for (Noticia n: LH.get_news_with_keyword(arguments)) {
+							jsonArr.add(n.toString());
+						}
+						myTextMsg.setText(jsonArr.toString());
 				    }
 				    else if (operation.equals("FiltrarTematica")) {
 				    	System.out.println("Solicitud de Filtrar por Temática");
@@ -163,7 +164,7 @@ public class Server {
 	                    System.exit(1);
 	                	break;
 	            	default:
-	            		System.out.println("operationción no válida");
+	            		System.out.println("operación no válida");
 	            		break;
                 }
             }
