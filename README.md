@@ -6,10 +6,12 @@
 - OpenJDK 8
 - OpenMQ 5.1.1
 
+**Nota**: OpenMQ está autocontenido en este repositorio.
+
 ## Instalar el broker
-Si no tienes instalado el broker, puedes instalarlo ejecutando el siguiente comando:
+Si no tienes instalado el broker, puedes instalarlo ejecutando el siguiente script desde el directorio raiz del proyecto:
 ```sh
-unzip scripts/openmq5_1_1.zip
+./scripts/install_mq.sh
 ```
 Esto creará la carpeta _mq_ en el directorio raiz del proyecto y te permitirá ejecutar el script _run_broker.sh_.
 
