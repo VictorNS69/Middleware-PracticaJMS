@@ -8,6 +8,72 @@
 
 **Nota**: OpenMQ está autocontenido en este repositorio.
 
+## Contenido del repositorio
+### Estructura general
+```
+practicajms/
+├── ClienteSN
+│   ├── pom.xml
+│   └── src
+│       ├── main
+│       │   └── java
+│       │       └── es
+│       │           └── upm
+│       │               └── middleware
+│       │                   ├── App.java
+│       │                   └── Client.java
+│       └── test
+│           └── java
+│               └── es
+│                   └── upm
+│                       └── middleware
+│                           └── AppTest.java
+├── docs
+│   ├── formato_noticia.txt
+│   └── Practica-JMS.pdf
+├── noticias_ejemplo
+│   ├── noticia_deportes.txt
+│   ├── noticia_economia.txt
+│   └── noticia_politica.txt
+├── README.md
+├── scripts
+│   ├── install_mq.sh
+│   ├── openmq5_1_1.zip
+│   ├── run_broker.sh
+│   ├── run_client.sh
+│   └── run_server.sh
+└── ServidorNoticias
+    ├── pom.xml
+    └── src
+        ├── main
+        │   └── java
+        │       └── es
+        │           └── upm
+        │               └── middleware
+        │                   ├── App.java
+        │                   ├── ListHandler.java
+        │                   ├── Noticia.java
+        │                   └── Server.java
+        └── test
+            └── java
+                └── es
+                    └── upm
+                        └── middleware
+                            └── AppTest.java
+
+```
+- **ClienteSN**: Código fuente del cliente
+- **docs**: Documentación relevante
+- **scripts**: Scripts para la ejecución de los distintos componentes del proyecto
+- **ServidorNoticias**: Código fuente del servidor
+### Definición de clases
+- Las clases **App.java** y **AppTest.java** tienen como función la de comprobar la correcta construcción del proyecto en Maven.
+- Cliente:
+  - **Client.java**: Contiene todo el código fuente del cliente
+- Servidor:
+  - **Noticia.java**: Contiene el objeto java _Noticia_
+  - **ListHandler.java**: Contiene la funcionalidad de manejar todas las noticias
+  - **Server.java**: Es el cuerpo principal del servidor, y el encargado de escuchar la llegada de mensajes
 ## Instalar el broker
 Si no tienes instalado el broker, puedes instalarlo ejecutando el siguiente script desde el directorio raiz del proyecto:
 ```sh
