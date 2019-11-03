@@ -4,10 +4,8 @@ import java.util.*;
 import es.upm.middleware.Noticia;
 
 
-
 public class ListHandler {
 	private static List<Noticia> total_noticias  = new ArrayList(); //Lista de noticias
-	private static List palabras_clave= new ArrayList();
 	private static List<Noticia> cat_politica= new ArrayList();
 	private static List<Noticia> cat_economia = new ArrayList();
 	private static List<Noticia> cat_deporte = new ArrayList();

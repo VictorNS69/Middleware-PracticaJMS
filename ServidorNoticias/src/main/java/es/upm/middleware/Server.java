@@ -14,6 +14,8 @@ import javax.jms.TextMessage;
 
 import com.google.gson.JsonArray;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import es.upm.middleware.ListHandler;
@@ -161,8 +163,41 @@ public class Server {
         		}
                 switch(operation) {
 	                case 1:
-	                	System.out.println("Añadir noticia terminal \n#TODO");
-	                	//TODO: 
+	                	System.out.println("Añadir noticia terminal");
+	            		Scanner sct = new Scanner(System.in);
+	            		String nombre = "";
+	            		String fecha = "";
+	            		String categoria = "";
+	            		String contenido = "";
+	            		String palabras_clave = "";
+	            		String[] keywords; 
+	            		System.out.println("¿Cual es el título de la noticia? \n ");
+	            		nombre = sct.nextLine();
+            			System.out.println("La categoría es ECONOMIA POLITICA o DEPORTE? \n ");
+            			categoria = sct.nextLine();
+            			if (!categoria.toUpperCase().equals("DEPORTE") &&
+            					!categoria.toUpperCase().equals("ECONOMIA") &&
+            					!categoria.toUpperCase().equals("POLITICA")) {
+            				System.out.println("La categoría introducida no coincide");
+            				break;
+            			}
+	            		System.out.println("¿Cual es la fecha de la noticia? (DD-MM-AAAA) \n ");
+	            		fecha = sct.nextLine();
+	            		if (!validarFecha(fecha)) {
+	            			System.out.println("La fecha no tiene un formato valido");
+            				break;
+	            		}
+	            		System.out.println("¿Cuales son las palabras clave de la notica? \n (Por favor, separelas con dos guiones para diferenciarlas y que no contengan espacios) \n ");
+	            		palabras_clave = sct.nextLine();
+	            		keywords = palabras_clave.split("--");
+	            		System.out.println("¿Cual es el contenido de la notica? \n ");
+	            		contenido = sct.nextLine();
+	            		Noticia noticiaT = new Noticia(nombre, fecha, categoria.toUpperCase(), keywords, contenido);
+	                	boolean statuss = LH.importar_noticia(noticiaT);
+	                	if (statuss)
+	                		System.out.println("La noticia se ha importado correctamente");
+	                	else
+	                		System.out.println("La noticia NO se ha importado");
 	                	break;
 	                case 2:
 	                	System.out.println("Añadir noticia desde un fichero \nEscribe la ruta GLOBAL");
@@ -170,8 +205,11 @@ public class Server {
 	                	String path = scF.nextLine();
 	                	try {
 		                	Noticia noticia = new Noticia(path);
-		                	LH.importar_noticia(noticia);
-		                	System.out.println("La noticia se ha importado correctamente");
+		                	boolean status = LH.importar_noticia(noticia);
+		                	if (status)
+		                		System.out.println("La noticia se ha importado correctamente");
+		                	else
+		                		System.out.println("La noticia NO se ha importado");
 						} catch (Exception e) {
 							System.out.println(e);
 						}
@@ -193,5 +231,17 @@ public class Server {
             jmse.printStackTrace();
             System.exit(1);
 		}
+	}
+	
+	public static boolean validarFecha(String fecha) {
+		try {
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
+			formatoFecha.setLenient(false);
+			formatoFecha.parse(fecha);
+		} 
+		catch (ParseException e){
+			return false;
+		}
+		return true;
 	}
 }

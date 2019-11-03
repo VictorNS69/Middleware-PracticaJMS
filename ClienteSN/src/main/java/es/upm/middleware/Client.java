@@ -38,7 +38,7 @@ public class Client {
 				int filtro = sc.nextInt(); 
 				switch(filtro){
 				case 1:
-					System.out.println("\nTematica?\n\t[1]Politica\n\t[2]Economia\n\t[3]Deportes\n");
+					System.out.println("\nTematica?\n\t[1]Politica\n\t[2]Economia\n\t[3]Deporte\n");
 					Scanner scF = new Scanner(System.in);
 					int tema = scF.nextInt();
 					switch(tema){
@@ -52,14 +52,18 @@ public class Client {
 							request("FiltrarTematica", "DEPORTES", suscripcion);
 							break;
 						default:
-							System.out.println("Entrada no valida.\n");
+							System.out.println("Categoria no valida.\n");
 							break;
 					}
 					break;
 				case 2:
-					System.out.println("\nIntroduzca Palabra Clave\n");
+					System.out.println("\nIntroduzca Palabra Clave\n(una única palabra y sin espacios)");
 					Scanner sck = new Scanner(System.in);
 					String keyk = sck.nextLine();
+					if (keyk == null || keyk.isEmpty() || keyk.equals("")) {
+						System.out.println("Palabra clave no valida");
+						break;
+					}
 					request("FiltrarPalabraClave", keyk, suscripcion);
 					break;
 				case 3:
