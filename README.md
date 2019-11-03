@@ -11,7 +11,7 @@
 ## Contenido del repositorio
 ### Estructura general
 ```
-practicajms/
+Middleware-PracticaJMS/
 ├── ClienteSN
 │   ├── pom.xml
 │   └── src
@@ -104,7 +104,7 @@ No es necesaria ninguna extensión de archivo, ni ninguna ruta específica, ya q
 
 Para mayor comodidad, se ha añadido una carpeta [_noticias_ejemplo_](/noticias_ejemplo) donde hay varios ejemplos de noticias para importar directamente.
 ## Autores
-- Víctor Nieves Sánchez (Scrum Master & Developer)
+- [Víctor Nieves Sánchez](https://github.com/VictorNS69/) (Scrum Master & Developer)
 - Ruben Garcia Garcia (Product Owner & Developer)
 - Eduardo Freyre Gomez (Developer)
 - Miguel Gonzalo Anton (Developer)
